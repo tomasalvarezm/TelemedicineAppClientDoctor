@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,9 +16,10 @@ import javax.swing.border.EmptyBorder;
 
 import com.toedter.calendar.JCalendar;
 
-import telemedicineApp.pojos.Patient;
-import telemedicineApp.pojos.Sex;
+import connection.ClientDoctor;
+import telemedicineApp.pojos.Doctor;
 
+import telemedicineApp.pojos.Sex;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -33,7 +35,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class PatientRegister extends JFrame {
+public class DoctorRegister extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField id;
@@ -41,7 +43,6 @@ public class PatientRegister extends JFrame {
 	private JTextField email;
 	private JTextField phoneNumber;
 	private JComboBox sex;
-	private LocalDate dob;
 	//private int age;
 	private JCalendar calendar;
 	private JPasswordField passwordField;
@@ -49,7 +50,7 @@ public class PatientRegister extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public PatientRegister(JFrame appDisplay) {
+	public DoctorRegister(JFrame appDisplay, ClientDoctor client) {
 		appDisplay.setVisible(false);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -77,19 +78,6 @@ public class PatientRegister extends JFrame {
 		name.setBorder(null);
 		contentPane.add(name);
 		
-		email = new JTextField();
-		email.setBackground(new Color(240,240,240));
-		email.setColumns(10);
-		email.setBounds(new Rectangle(112, 116, 218, 20));
-		email.setBorder(null);
-		contentPane.add(email);
-		
-		phoneNumber = new JTextField();
-		phoneNumber.setBackground(new Color(240,240,240));
-		phoneNumber.setColumns(10);
-		phoneNumber.setBounds(new Rectangle(112, 147, 218, 20));
-		phoneNumber.setBorder(null);
-		contentPane.add(phoneNumber);
 		
 		passwordField = new JPasswordField();
 		passwordField.setBackground(new Color(240, 240, 240));
@@ -101,14 +89,6 @@ public class PatientRegister extends JFrame {
 		lblFullName.setBounds(21, 93, 71, 14);
 		contentPane.add(lblFullName);
 		
-		JLabel lblEmail = new JLabel("Email :");
-		lblEmail.setBounds(21, 124, 57, 14);
-		contentPane.add(lblEmail);
-		
-		JLabel lblPhoneNumber = new JLabel("Phone number:");
-		lblPhoneNumber.setBounds(21, 155, 95, 14);
-		contentPane.add(lblPhoneNumber);
-		
 		sex = new JComboBox();
 		sex.setModel(new DefaultComboBoxModel(new String[] {"Male", "Female"}));
 		sex.setBounds(112, 183, 95, 22);
@@ -117,24 +97,6 @@ public class PatientRegister extends JFrame {
 		JLabel lblSex = new JLabel("Sex :");
 		lblSex.setBounds(21, 187, 95, 14);
 		contentPane.add(lblSex);
-		
-		JLabel lblAge = new JLabel("Date of birth :");
-		lblAge.setBounds(455, 59, 95, 14);
-		contentPane.add(lblAge);
-		
-		calendar = new JCalendar();
-		calendar.addPropertyChangeListener(new PropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent evt) {
-				if(evt.getOldValue() != null) {
-					int year = calendar.getYearChooser().getYear();
-					int month = calendar.getMonthChooser().getMonth();
-					int day = calendar.getDayChooser().getDay();
-					dob = LocalDate.of(year, month, day);
-				}
-			}
-		});
-		calendar.setBounds(406, 87, 198, 153);
-		contentPane.add(calendar);
 		
 		JSeparator separator = new JSeparator();
 		separator.setForeground(Color.BLACK);
@@ -170,7 +132,7 @@ public class PatientRegister extends JFrame {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				appDisplay.setVisible(true);
-				PatientRegister.this.setVisible(false);
+				DoctorRegister.this.setVisible(false);
 			}
 		});
 		back.setBounds(21, 318, 77, 18);
@@ -182,35 +144,31 @@ public class PatientRegister extends JFrame {
 		register.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if (!validateEmail(email.getText())) {
-					JOptionPane.showMessageDialog(PatientRegister.this, "Invalid email", "Message",
-							JOptionPane.ERROR_MESSAGE);
-				} else if(dob == null){
-					JOptionPane.showMessageDialog(PatientRegister.this, "Select your date of birth", "Message",
+				if (id == null) {
+					JOptionPane.showMessageDialog(DoctorRegister.this, "Invalid id", "Message",
 							JOptionPane.WARNING_MESSAGE);
 				} else {
 					try {
-						Patient p = new Patient();
-						p.setId(id.getText());
-						p.setName(name.getText());
-						p.setEmail(email.getText());
-						p.setPhoneNumber(Integer.parseInt(phoneNumber.getText()));
-						p.setDob(dob);
-						p.setAge(getAge(dob));
+						Doctor d = new Doctor();
+						d.setId(id.getText());
+						d.setName(name.getText());
 						if(sex.getSelectedItem().toString().equalsIgnoreCase("male")) {
-							p.setSex(Sex.MALE);
+							d.setSex(Sex.MALE);
 						} else {
-							p.setSex(Sex.FEMALE);
+							d.setSex(Sex.FEMALE);
 						}
-						System.out.println(p);
+						System.out.println(d);
 						
-					} catch (NumberFormatException ex) {
-						JOptionPane.showMessageDialog(PatientRegister.this, "Invalid id or pone number", "Message",
+						//check that the client is registered successfully
+						if(client.registerDoctor(d)) {
+							JOptionPane.showMessageDialog(DoctorRegister.this, "Successfully registered", "Message",
+									JOptionPane.OK_OPTION);
+						}
+					} catch (IOException ex) {
+						JOptionPane.showMessageDialog(DoctorRegister.this, "Problems connecting with server", "Message",
 								JOptionPane.ERROR_MESSAGE);
 					}
-					
-					
-					
+		
 				}
 			}
 		});
@@ -220,24 +178,4 @@ public class PatientRegister extends JFrame {
 		contentPane.add(register);
 	}
 	
-	private boolean validateEmail(String email) {
-		//Pattern pattern = Pattern.compile("([a-z0-9]+(\\.?[a-z0-9])*)+@(([a-z]+)\\.([a-z]+))+"); // String of available characters and pattern
-		Pattern pattern = Pattern.compile("([a-z0-9]+(\\.?[a-z0-9])*)+@([a-z]+(\\.[a-z]+)+)"); // String of available characters and pattern
-		Matcher matcher = pattern.matcher(email);
-		return matcher.find();
-	}
-	
-	private int getAge(LocalDate birth) {
-		int age = 0;
-		if(LocalDate.now().getMonthValue() > birth.getMonthValue()) {
-			age = LocalDate.now().getYear() - birth.getYear();
-		} else if (LocalDate.now().getDayOfMonth() == birth.getMonthValue()) {
-			if(LocalDate.now().getDayOfMonth() >= birth.getDayOfMonth()) {
-				age = LocalDate.now().getYear() - birth.getYear();
-			}
-		} else {
-			age = LocalDate.now().getYear() - birth.getYear() - 1;
-		}
-		return age;
-	}
 }

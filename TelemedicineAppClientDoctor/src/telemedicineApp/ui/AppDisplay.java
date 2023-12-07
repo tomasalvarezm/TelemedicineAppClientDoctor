@@ -7,6 +7,9 @@ import java.awt.Image;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import connection.ClientDoctor;
+
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -20,6 +23,7 @@ public class AppDisplay extends JFrame {
 	private JPanel contentPane;
 	private JTextField username;
 	private JPasswordField password;
+	private ClientDoctor client;
 
 	
 	public static void main(String[] args) {
@@ -49,9 +53,9 @@ public class AppDisplay extends JFrame {
 		JButton logIn = new JButton("Log in");
 		logIn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//patient = databaseManager.checkPatient(username.toString(), password.toString());
-				JFrame patientDisplay = new PatientDisplay(AppDisplay.this);
-				patientDisplay.setVisible(true);
+				//doctor = databaseManager.checkDoctor(username.toString(), password.toString());
+				JFrame DoctorDisplay = new DoctorDisplay(AppDisplay.this);
+				DoctorDisplay.setVisible(true);
 			}
 		});
 		logIn.setBounds(183, 187, 230, 23);
@@ -83,8 +87,8 @@ public class AppDisplay extends JFrame {
 		JButton register = new JButton("Register");
 		register.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFrame patientRegister = new PatientRegister(AppDisplay.this);
-				patientRegister.setVisible(true);
+				JFrame doctorRegister = new DoctorRegister(AppDisplay.this, client);
+				doctorRegister.setVisible(true);
 			}
 		});
 		register.setBounds(183, 221, 230, 23);

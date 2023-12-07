@@ -16,7 +16,7 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class PatientDisplay extends JFrame {
+public class DoctorDisplay extends JFrame {
 
 	private JPanel contentPane;
 	private JPanel signalPane;
@@ -24,7 +24,7 @@ public class PatientDisplay extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public PatientDisplay(JFrame appDisplay) {
+	public DoctorDisplay(JFrame appDisplay) {
 		appDisplay.setVisible(false);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
