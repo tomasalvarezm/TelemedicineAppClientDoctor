@@ -3,24 +3,29 @@ package connection;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import telemedicineApp.pojos.Doctor;
 import telemedicineApp.pojos.Patient;
 
 import java.net.Socket;
 
 public class ClientDoctor {
 	private Socket socket;
+	private ObjectOutputStream objectOutput;
 	private ObjectInputStream objectInput;
 	
 	//Constructor
-	public ClientDoctor(Socket socket, ObjectInputStream objectInput) {
-		super();
-		this.socket = socket;
-		//para captar excepciones
+	public ClientDoctor(String serverIP, int port) {
+		
 		try {
-			this.objectInput = new ObjectInputStream(this.socket.getInputStream());
+			this.socket = new Socket (serverIP, port);
+			this.objectOutput = new ObjectOutputStream(socket.getOutputStream());
+			this.objectInput = new ObjectInputStream(socket.getInputStream());
+			
 
 		}catch(IOException ex) {
             Logger.getLogger(ClientDoctor.class.getName()).log(Level.SEVERE, null, ex);
@@ -29,38 +34,43 @@ public class ClientDoctor {
 	}
 	
 	
-	public Patient readPatients() {
-		Patient patient=null;
-		while (socket.isConnected()) {
-		Object object=null;
-		try {
-			object = objectInput.readObject();
-			//TODO revisar excepciones
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//instanceof lo utilizamos para comprobar si el objeto recibido 
-		//es de la clase que se indica posteriormente.
-		if(object instanceof Patient) {
-			patient= (Patient) object;
-		}
-		}
-		return patient;
+	
+	public void sendFunction(String function) throws IOException {
+		objectOutput.writeObject(function);
 	}
 	
-	public void releaseResources() {
-		try {
-		try {
-            objectInput.close();
+	public boolean registerDoctor(Doctor doctor) throws IOException {
+		objectOutput.writeObject(doctor);
+		return objectInput.readBoolean();
+	}
+	
+	public Doctor checkDoctor(String id) throws IOException, ClassNotFoundException {
+		objectOutput.writeObject(id);
+		Doctor doctor = (Doctor) objectInput.readObject();
+		return doctor;
+	}
+	public ArrayList <Patient> getPatients (String id) throws IOException, ClassNotFoundException{ 
+		objectOutput.writeObject(id);
+		ArrayList <Patient> patients = (ArrayList <Patient>)objectInput.readObject();
+		return patients;
+		
+	}
+	
+	private static void releaseResources(OutputStream outputStream, Socket socket) {
+        try {
+            try {
+            	
+                outputStream.close();
+                
+            } catch (IOException ex) {
+                Logger.getLogger(ClientDoctor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            socket.close();
 
         } catch (IOException ex) {
             Logger.getLogger(ClientDoctor.class.getName()).log(Level.SEVERE, null, ex);
         }
-        socket.close();
-    } catch (IOException ex) {
-        Logger.getLogger(ClientDoctor.class.getName()).log(Level.SEVERE, null, ex);
+
     }
-	}
 }
