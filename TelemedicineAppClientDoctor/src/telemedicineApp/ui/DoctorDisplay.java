@@ -158,6 +158,19 @@ public class DoctorDisplay extends JFrame {
 		contentPane.add(physiologicalParam);
 		
 		JButton logout = new JButton("Log out");
+		logout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				try {
+					client.sendFunction("logout");
+					client.closeConnection();
+					System.exit(0);
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(DoctorDisplay.this, "Problems closing connection", "Message",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		logout.setBounds(426, 11, 89, 23);
 		contentPane.add(logout);
 	}

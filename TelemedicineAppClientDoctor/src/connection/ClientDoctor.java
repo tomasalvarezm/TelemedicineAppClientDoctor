@@ -20,74 +20,63 @@ public class ClientDoctor {
 	private Socket socket;
 	private ObjectOutputStream objectOutput;
 	private ObjectInputStream objectInput;
-	
-	//Constructor
+
+	// Constructor
 	public ClientDoctor(String serverIP, int port) {
-		
+
 		try {
-			
-			this.socket = new Socket (serverIP, port);
+
+			this.socket = new Socket(serverIP, port);
 			this.objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			this.objectInput = new ObjectInputStream(socket.getInputStream());
-			
-		}catch(IOException ex) {
-            Logger.getLogger(ClientDoctor.class.getName()).log(Level.SEVERE, null, ex);
+
+		} catch (IOException ex) {
+			Logger.getLogger(ClientDoctor.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
-	
-	
-	private static void releaseResources(OutputStream outputStream, Socket socket) {
-        try {
-            try {
-            	
-                outputStream.close();
-                
-            } catch (IOException ex) {
-                Logger.getLogger(ClientDoctor.class.getName()).log(Level.SEVERE, null, ex);
-            }
 
-            socket.close();
+	public void closeConnection() throws IOException {
 
-        } catch (IOException ex) {
-            Logger.getLogger(ClientDoctor.class.getName()).log(Level.SEVERE, null, ex);
-        }
+		objectInput.close();
+		objectOutput.close();
+		socket.close();
 
-    }
-	
-	
+	}
+
 	public void sendFunction(String function) throws IOException {
 		objectOutput.writeObject(function);
 		objectOutput.flush();
 	}
-	
+
 	public boolean registerDoctor(Doctor doctor) throws IOException {
 		objectOutput.writeObject(doctor);
 		objectOutput.flush();
 		return objectInput.readBoolean();
 	}
-	
+
 	public Doctor checkDoctor(String id) throws IOException, ClassNotFoundException {
 		objectOutput.writeObject(id);
 		objectOutput.flush();
 		Doctor doctor = (Doctor) objectInput.readObject();
 		return doctor;
 	}
-	
-	public ArrayList<Patient> getPatients(String id) throws IOException, ClassNotFoundException{ 
+
+	public ArrayList<Patient> getPatients(String id) throws IOException, ClassNotFoundException {
 		objectOutput.writeObject(id);
 		objectOutput.flush();
 		ArrayList<Patient> patients = (ArrayList<Patient>) objectInput.readObject();
 		return patients;
 	}
-	
+
 	public Patient getPatient(String id) throws IOException, ClassNotFoundException {
 		objectOutput.writeObject(id);
 		objectOutput.flush();
 		Patient patient = (Patient) objectInput.readObject();
 		return patient;
 	}
-	
-	public MedicalHistory getMedicalHistory(String patientID, LocalDate date) throws IOException, ClassNotFoundException {
+
+	public MedicalHistory getMedicalHistory(String patientID, LocalDate date)
+			throws IOException, ClassNotFoundException {
 		objectOutput.writeObject(patientID);
 		objectOutput.flush();
 		objectOutput.writeObject(date);
@@ -95,15 +84,16 @@ public class ClientDoctor {
 		MedicalHistory medicalHistory = (MedicalHistory) objectInput.readObject();
 		return medicalHistory;
 	}
-	
-	public ArrayList<MedicalHistory> getAllMedicalHistory(String patientID) throws IOException, ClassNotFoundException{
+
+	public ArrayList<MedicalHistory> getAllMedicalHistory(String patientID) throws IOException, ClassNotFoundException {
 		objectOutput.writeObject(patientID);
 		objectOutput.flush();
 		ArrayList<MedicalHistory> allMedicalHistory = (ArrayList<MedicalHistory>) objectInput.readObject();
 		return allMedicalHistory;
 	}
-	
-	public BitalinoSignal getBitalinoSignal(String patientID, LocalDate date) throws IOException, ClassNotFoundException {
+
+	public BitalinoSignal getBitalinoSignal(String patientID, LocalDate date)
+			throws IOException, ClassNotFoundException {
 		objectOutput.writeObject(patientID);
 		objectOutput.flush();
 		objectOutput.writeObject(date);
@@ -111,12 +101,12 @@ public class ClientDoctor {
 		BitalinoSignal bitalinoSignal = (BitalinoSignal) objectInput.readObject();
 		return bitalinoSignal;
 	}
-	
-	public ArrayList<BitalinoSignal> getBitalinoSignals(String patientID) throws IOException, ClassNotFoundException{
+
+	public ArrayList<BitalinoSignal> getBitalinoSignals(String patientID) throws IOException, ClassNotFoundException {
 		objectOutput.writeObject(patientID);
 		objectOutput.flush();
 		ArrayList<BitalinoSignal> bitalinoSignals = (ArrayList<BitalinoSignal>) objectInput.readObject();
 		return bitalinoSignals;
 	}
-	
+
 }
