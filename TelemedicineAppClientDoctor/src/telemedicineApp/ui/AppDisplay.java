@@ -69,9 +69,10 @@ public class AppDisplay extends JFrame {
 					if(doctor != null) {
 						JFrame DoctorDisplay = new DoctorDisplay(AppDisplay.this, client, doctor);
 						DoctorDisplay.setVisible(true);	
+					} else {
+						JOptionPane.showMessageDialog(AppDisplay.this, "You need to register first!", "Message",
+								JOptionPane.WARNING_MESSAGE);
 					}
-					JOptionPane.showMessageDialog(AppDisplay.this, "You need to register first!", "Message",
-							JOptionPane.WARNING_MESSAGE);
 				} catch (ClassNotFoundException | IOException e1) {
 					JOptionPane.showMessageDialog(AppDisplay.this, "Problems connecting with server", "Message",
 							JOptionPane.ERROR_MESSAGE);

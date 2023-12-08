@@ -29,6 +29,10 @@ public class ClientDoctor {
 			this.socket = new Socket(serverIP, port);
 			this.objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			this.objectInput = new ObjectInputStream(socket.getInputStream());
+			
+			String role = "doctor";
+			objectOutput.writeObject(role);
+			objectOutput.flush();
 
 		} catch (IOException ex) {
 			Logger.getLogger(ClientDoctor.class.getName()).log(Level.SEVERE, null, ex);

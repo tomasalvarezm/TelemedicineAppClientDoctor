@@ -64,6 +64,9 @@ public class PatientMH extends JFrame {
 		back.setBounds(10, 327, 89, 23);
 		contentPane.add(back);
 		
+		textPane = new JTextPane();
+		scrollPane.setViewportView(textPane);
+		
 		JComboBox medHistDate = new JComboBox();
 		medHistDate.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -92,8 +95,6 @@ public class PatientMH extends JFrame {
 		lblNewLabel.setBounds(78, 30, 104, 18);
 		contentPane.add(lblNewLabel);
 		
-		textPane = new JTextPane();
-		scrollPane.setViewportView(textPane);
 		
 	}
 }

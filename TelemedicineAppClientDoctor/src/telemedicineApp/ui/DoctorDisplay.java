@@ -79,18 +79,18 @@ public class DoctorDisplay extends JFrame {
 		ArrayList<Patient> patients = new ArrayList<Patient>();
 		try {
 			patients = client.getPatients(doctor.getId());
-			if(patients == null) {
-				JOptionPane.showMessageDialog(DoctorDisplay.this, "No patients yet", "Message",
-						JOptionPane.WARNING_MESSAGE);
-			}
+			System.out.println("soy client");
+			System.out.println(patients);
 		} catch (ClassNotFoundException | IOException e) {
 			JOptionPane.showMessageDialog(DoctorDisplay.this, "Problems connecting with server", "Message",
 					JOptionPane.ERROR_MESSAGE);
 		}
-		for(Patient patient : patients) {
-			Object[] datos = new Object[] { patient.getId(), patient.getName(), patient.getSex(), patient.getAge(),
-					patient.getDob(), patient.getEmail(), patient.getPhoneNumber() };
-			model.addRow(datos);
+		if(patients != null) {
+			for(Patient patient : patients) {
+				Object[] datos = new Object[] { patient.getId(), patient.getName(), patient.getSex(), patient.getAge(),
+						patient.getDob(), patient.getEmail(), patient.getPhoneNumber() };
+				model.addRow(datos);
+			}
 		}
 		table.setModel(model);
 		
