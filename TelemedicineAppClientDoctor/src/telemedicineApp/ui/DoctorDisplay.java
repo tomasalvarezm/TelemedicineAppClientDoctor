@@ -6,80 +6,159 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
+import com.toedter.calendar.JDayChooser;
+import com.toedter.calendar.JDateChooser;
+import com.toedter.components.JSpinField;
+
+import connection.ClientDoctor;
+import telemedicineApp.pojos.BitalinoSignal;
+import telemedicineApp.pojos.Doctor;
+import telemedicineApp.pojos.MedicalHistory;
+import telemedicineApp.pojos.Patient;
+
+import com.toedter.calendar.JMonthChooser;
+import com.toedter.calendar.JCalendar;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class DoctorDisplay extends JFrame {
 
 	private JPanel contentPane;
-	private JPanel signalPane;
+	private JTable table;
 
 	/**
 	 * Create the frame.
 	 */
-	public DoctorDisplay(JFrame appDisplay) {
+	public DoctorDisplay(JFrame appDisplay, ClientDoctor client, Doctor doctor) {
 		appDisplay.setVisible(false);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 602, 346);
+		setBounds(100, 100, 541, 341);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JCheckBox dizziness = new JCheckBox("Dizziness");
-		dizziness.setBounds(46, 150, 97, 23);
-		contentPane.add(dizziness);
-		DefaultListModel dlm = new DefaultListModel();
-		dlm.addElement(dizziness);
 		
-		JComboBox medication = new JComboBox();
-		medication.setModel(new DefaultComboBoxModel(new String[] {"Levodopa", "Pramipexol"}));
-		medication.setBounds(46, 60, 200, 22);
-		contentPane.add(medication);
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(86, 90, 358, 114);
+		contentPane.add(scrollPane);
 		
-		JLabel lblNewLabel = new JLabel("Select your medication");
-		lblNewLabel.setBounds(46, 35, 163, 14);
-		contentPane.add(lblNewLabel);
+		table = new JTable();
+		scrollPane.setViewportView(table);
 		
-		JLabel lblIndicateYourSymptoms = new JLabel("Indicate your symptoms");
-		lblIndicateYourSymptoms.setBounds(46, 129, 163, 14);
-		contentPane.add(lblIndicateYourSymptoms);
+		DefaultTableModel model = new DefaultTableModel() {
+			public boolean isCellEditable(int fil, int col) {
+				return false;
+			}
+		};
+		model.addColumn("ID");
+		model.addColumn("Name");
+		model.addColumn("Sex");
+		model.addColumn("Age");
+		model.addColumn("Date of birth");
+		model.addColumn("Email");
+		model.addColumn("Phone number");
 		
-		JCheckBox drowsiness = new JCheckBox("Drowsiness");
-		drowsiness.setBounds(46, 186, 97, 23);
-		contentPane.add(drowsiness);
 		
-		JCheckBox nausea = new JCheckBox("Nausea");
-		nausea.setBounds(145, 150, 97, 23);
-		contentPane.add(nausea);
+		ArrayList<Patient> patients = new ArrayList<Patient>();
+		try {
+			patients = client.getPatients(doctor.getId());
+			if(patients == null) {
+				JOptionPane.showMessageDialog(DoctorDisplay.this, "No patients yet", "Message",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		} catch (ClassNotFoundException | IOException e) {
+			JOptionPane.showMessageDialog(DoctorDisplay.this, "Problems connecting with server", "Message",
+					JOptionPane.ERROR_MESSAGE);
+		}
+		for(Patient patient : patients) {
+			Object[] datos = new Object[] { patient.getId(), patient.getName(), patient.getSex(), patient.getAge(),
+					patient.getDob(), patient.getEmail(), patient.getPhoneNumber() };
+			model.addRow(datos);
+		}
+		table.setModel(model);
 		
-		JCheckBox alucinations = new JCheckBox("Alucinations");
-		alucinations.setBounds(145, 186, 97, 23);
-		contentPane.add(alucinations);
 		
-		JCheckBox swelling = new JCheckBox("Swelling");
-		swelling.setBounds(260, 150, 97, 23);
-		contentPane.add(swelling);
+		JButton medicalHistory = new JButton("Medical history");
+		medicalHistory.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(table.getSelectedRowCount() > 0) {
+					int i = table.getSelectedRow();
+					String patientID = table.getValueAt(i, 0).toString();
+					try {
+						client.sendFunction("medicalhistory");
+						Patient patientSelected = client.getPatient(patientID);
+						ArrayList<MedicalHistory> allMedicalHistory = client.getAllMedicalHistory(patientID);
+						if(allMedicalHistory != null) {
+							JFrame patientMH = new PatientMH(DoctorDisplay.this, client, patientSelected, allMedicalHistory);
+							patientMH.setVisible(true);
+						} else {
+							JOptionPane.showMessageDialog(DoctorDisplay.this, "Patient has not upload any medical reports", "Message",
+									JOptionPane.WARNING_MESSAGE);
+						}
+					} catch (ClassNotFoundException | IOException e1) {
+						JOptionPane.showMessageDialog(DoctorDisplay.this, "Problems connecting with server", "Message",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					JOptionPane.showMessageDialog(DoctorDisplay.this, "Select a patient", "Message",
+							JOptionPane.WARNING_MESSAGE);
+				}
+			}
+		});
+		medicalHistory.setBounds(110, 245, 137, 32);
+		contentPane.add(medicalHistory);
 		
-		JCheckBox lackOfAppetite = new JCheckBox("Lack of appetite");
-		lackOfAppetite.setBounds(260, 186, 130, 23);
-		contentPane.add(lackOfAppetite);
+		JButton physiologicalParam = new JButton("Physiological Param");
+		physiologicalParam.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(table.getSelectedRowCount() > 0) {
+					int i = table.getSelectedRow();
+					String patientID = table.getValueAt(i, 0).toString();
+					try {
+						client.sendFunction("signal");
+						Patient patientSelected = client.getPatient(patientID);
+						ArrayList<BitalinoSignal> bitalinoSignals = client.getBitalinoSignals(patientID);
+						if(bitalinoSignals != null) {
+							JFrame patientPP = new PatientPP(DoctorDisplay.this, client, patientSelected, bitalinoSignals);
+							patientPP.setVisible(true);
+						} else {
+							JOptionPane.showMessageDialog(DoctorDisplay.this, "Patient has not upload any BITalino signals", "Message",
+									JOptionPane.WARNING_MESSAGE);
+						}
+					} catch (ClassNotFoundException | IOException e1) {
+						JOptionPane.showMessageDialog(DoctorDisplay.this, "Problems connecting with server", "Message",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					JOptionPane.showMessageDialog(DoctorDisplay.this, "Select a patient", "Message",
+							JOptionPane.WARNING_MESSAGE);
+				}
+			}
+		});
+		physiologicalParam.setBounds(283, 245, 137, 32);
+		contentPane.add(physiologicalParam);
 		
-		signalPane = new JPanel();
-		signalPane.setBounds(23, 11, 367, 215);
-		contentPane.add(signalPane);
-		
-		JButton uploadSignal = new JButton("Upload Signal");
-		uploadSignal.setBounds(46, 240, 137, 32);
-		contentPane.add(uploadSignal);
-		
+		JButton logout = new JButton("Log out");
+		logout.setBounds(426, 11, 89, 23);
+		contentPane.add(logout);
 	}
 }

@@ -1,14 +1,7 @@
 package telemedicineApp.ui;
 
-import java.awt.BorderLayout;
-
 import java.awt.Image;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -40,11 +33,7 @@ public class DoctorRegister extends JFrame {
 	private JPanel contentPane;
 	private JTextField id;
 	private JTextField name;
-	private JTextField email;
-	private JTextField phoneNumber;
 	private JComboBox sex;
-	//private int age;
-	private JCalendar calendar;
 	private JPasswordField passwordField;
 	
 	/**
@@ -54,7 +43,7 @@ public class DoctorRegister extends JFrame {
 		appDisplay.setVisible(false);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 636, 386);
+		setBounds(100, 100, 453, 343);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -81,7 +70,7 @@ public class DoctorRegister extends JFrame {
 		
 		passwordField = new JPasswordField();
 		passwordField.setBackground(new Color(240, 240, 240));
-		passwordField.setBounds(new Rectangle(112, 216, 218, 20));
+		passwordField.setBounds(new Rectangle(112, 162, 218, 20));
 		passwordField.setBorder(null);
 		contentPane.add(passwordField);
 		
@@ -91,11 +80,11 @@ public class DoctorRegister extends JFrame {
 		
 		sex = new JComboBox();
 		sex.setModel(new DefaultComboBoxModel(new String[] {"Male", "Female"}));
-		sex.setBounds(112, 183, 95, 22);
+		sex.setBounds(112, 129, 95, 22);
 		contentPane.add(sex);
 		
 		JLabel lblSex = new JLabel("Sex :");
-		lblSex.setBounds(21, 187, 95, 14);
+		lblSex.setBounds(21, 133, 95, 14);
 		contentPane.add(lblSex);
 		
 		JSeparator separator = new JSeparator();
@@ -108,23 +97,13 @@ public class DoctorRegister extends JFrame {
 		separator_1.setBounds(112, 104, 218, 2);
 		contentPane.add(separator_1);
 		
-		JSeparator separator_2 = new JSeparator();
-		separator_2.setForeground(Color.BLACK);
-		separator_2.setBounds(112, 136, 218, 2);
-		contentPane.add(separator_2);
-		
-		JSeparator separator_3 = new JSeparator();
-		separator_3.setForeground(Color.BLACK);
-		separator_3.setBounds(112, 167, 218, 2);
-		contentPane.add(separator_3);
-		
 		JLabel lblPassword = new JLabel("Password :");
-		lblPassword.setBounds(21, 222, 65, 16);
+		lblPassword.setBounds(21, 168, 65, 16);
 		contentPane.add(lblPassword);
 		
 		JSeparator separator_4 = new JSeparator();
 		separator_4.setForeground(Color.BLACK);
-		separator_4.setBounds(112, 236, 218, 2);
+		separator_4.setBounds(112, 182, 218, 2);
 		contentPane.add(separator_4);
 		
 		JButton back = new JButton("");
@@ -135,7 +114,7 @@ public class DoctorRegister extends JFrame {
 				DoctorRegister.this.setVisible(false);
 			}
 		});
-		back.setBounds(21, 318, 77, 18);
+		back.setBounds(21, 257, 77, 18);
 		Image backImg = new ImageIcon(this.getClass().getResource("/back.png")).getImage();
 		back.setIcon(new ImageIcon(backImg));
 		contentPane.add(back);
@@ -145,25 +124,28 @@ public class DoctorRegister extends JFrame {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (id == null) {
-					JOptionPane.showMessageDialog(DoctorRegister.this, "Invalid id", "Message",
+					JOptionPane.showMessageDialog(DoctorRegister.this, "Introduce your ID", "Message",
 							JOptionPane.WARNING_MESSAGE);
 				} else {
 					try {
-						Doctor d = new Doctor();
-						d.setId(id.getText());
-						d.setName(name.getText());
+						Doctor doctor = new Doctor();
+						doctor.setId(id.getText());
+						doctor.setName(name.getText());
 						if(sex.getSelectedItem().toString().equalsIgnoreCase("male")) {
-							d.setSex(Sex.MALE);
+							doctor.setSex(Sex.MALE);
 						} else {
-							d.setSex(Sex.FEMALE);
+							doctor.setSex(Sex.FEMALE);
 						}
-						System.out.println(d);
+						
+						client.sendFunction("register");
 						
 						//check that the client is registered successfully
-						if(client.registerDoctor(d)) {
+						if(client.registerDoctor(doctor)) {
 							JOptionPane.showMessageDialog(DoctorRegister.this, "Successfully registered", "Message",
-									JOptionPane.OK_OPTION);
+									JOptionPane.PLAIN_MESSAGE);
 						}
+						appDisplay.setVisible(true);
+						DoctorRegister.this.setVisible(false);
 					} catch (IOException ex) {
 						JOptionPane.showMessageDialog(DoctorRegister.this, "Problems connecting with server", "Message",
 								JOptionPane.ERROR_MESSAGE);
@@ -172,7 +154,7 @@ public class DoctorRegister extends JFrame {
 				}
 			}
 		});
-		register.setBounds(520, 316, 90, 20);
+		register.setBounds(317, 257, 90, 20);
 		Image registerImg = new ImageIcon(this.getClass().getResource("/register.png")).getImage();
 		register.setIcon(new ImageIcon(registerImg));
 		contentPane.add(register);

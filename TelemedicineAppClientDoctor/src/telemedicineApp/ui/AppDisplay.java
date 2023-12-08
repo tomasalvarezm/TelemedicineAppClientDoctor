@@ -9,19 +9,25 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import connection.ClientDoctor;
+import telemedicineApp.pojos.Doctor;
+import telemedicineApp.pojos.Patient;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class AppDisplay extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField username;
+	private JTextField userID;
 	private JPasswordField password;
 	private ClientDoctor client;
 
@@ -43,6 +49,9 @@ public class AppDisplay extends JFrame {
 	 * Create the frame.
 	 */
 	public AppDisplay() {
+		
+		client = new ClientDoctor("localhost", 9000);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 639, 386);
 		contentPane = new JPanel();
@@ -51,22 +60,33 @@ public class AppDisplay extends JFrame {
 		contentPane.setLayout(null);
 		
 		JButton logIn = new JButton("Log in");
-		logIn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				//doctor = databaseManager.checkDoctor(username.toString(), password.toString());
-				JFrame DoctorDisplay = new DoctorDisplay(AppDisplay.this);
-				DoctorDisplay.setVisible(true);
+		logIn.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				try {
+					client.sendFunction("login");
+					Doctor doctor = client.checkDoctor(userID.getText());
+					if(doctor != null) {
+						JFrame DoctorDisplay = new DoctorDisplay(AppDisplay.this, client, doctor);
+						DoctorDisplay.setVisible(true);	
+					}
+					JOptionPane.showMessageDialog(AppDisplay.this, "You need to register first!", "Message",
+							JOptionPane.WARNING_MESSAGE);
+				} catch (ClassNotFoundException | IOException e1) {
+					JOptionPane.showMessageDialog(AppDisplay.this, "Problems connecting with server", "Message",
+							JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		logIn.setBounds(183, 187, 230, 23);
 		contentPane.add(logIn);
 		
-		username = new JTextField();
-		username.setBounds(173, 125, 269, 20);
-		contentPane.add(username);
-		username.setColumns(10);
+		userID = new JTextField();
+		userID.setBounds(173, 125, 269, 20);
+		contentPane.add(userID);
+		userID.setColumns(10);
 		
-		JLabel lblNewLabel = new JLabel("Username :");
+		JLabel lblNewLabel = new JLabel("ID :");
 		lblNewLabel.setBounds(93, 128, 77, 14);
 		contentPane.add(lblNewLabel);
 		
@@ -85,8 +105,9 @@ public class AppDisplay extends JFrame {
 		contentPane.add(imgLabel);
 		
 		JButton register = new JButton("Register");
-		register.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		register.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
 				JFrame doctorRegister = new DoctorRegister(AppDisplay.this, client);
 				doctorRegister.setVisible(true);
 			}

@@ -1,9 +1,11 @@
 package telemedicineApp.pojos;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Doctor {
+public class Doctor implements Serializable{
 
+	private static final long serialVersionUID = -4009178969875266980L;
 	private String id;
 	private String name;
 	private Sex sex;
@@ -65,4 +67,3 @@ public class Doctor {
 	
 	
 }
-
