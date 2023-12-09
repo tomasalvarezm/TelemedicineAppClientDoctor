@@ -30,6 +30,7 @@ public class ClientDoctor {
 			this.objectOutput = new ObjectOutputStream(socket.getOutputStream());
 			this.objectInput = new ObjectInputStream(socket.getInputStream());
 			
+			//when initiating the program as doctor the server receives the "doctor" message to know the role of the client
 			String role = "doctor";
 			objectOutput.writeObject(role);
 			objectOutput.flush();
