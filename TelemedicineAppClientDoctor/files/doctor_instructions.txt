@@ -1,0 +1,17 @@
+DOCTOR’S INSTRUCTIONS:
+
+If it’s the first time you access the application, you will need to register as a new doctor clicking
+in the “REGISTER” button. Then, a new screen will appear, where you will have to enter your ID, name
+and sex. 
+
+Once you are registered, you will be able to log in your account by typing your ID.
+
+Then, you will have access to your patient’s list with their personal and medical information.
+ 
+By selecting one patient, you could choose between seeing that patient's medical history, which
+includes the medication they are taking and the different side effects they might be experiencing, or
+the physiological parameters. After choosing, a new screen will appear in which you can sort by date
+which file you want to open. This applies for the medical history of the patient as same as for the
+recorded EMG bitalino signal (with the time it took to record the signal).
+
+Once you are finished, you can exit the application safely. 

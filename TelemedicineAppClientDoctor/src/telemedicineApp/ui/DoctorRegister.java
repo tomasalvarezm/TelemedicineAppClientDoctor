@@ -45,7 +45,7 @@ public class DoctorRegister extends JFrame {
 		setTitle("Doctor");
 		appDisplay.setVisible(false);
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 453, 343);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -161,7 +161,8 @@ public class DoctorRegister extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				try {
-					client.closeConnection();
+					client.sendFunction("back");
+					appDisplay.setVisible(true);
 				} catch (IOException e1) {
 					JOptionPane.showMessageDialog(DoctorRegister.this, "Problems closing connection", "Message",
 							JOptionPane.ERROR_MESSAGE);

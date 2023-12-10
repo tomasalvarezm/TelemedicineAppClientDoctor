@@ -127,6 +127,8 @@ public class AppDisplay extends JFrame {
 		manual.setIcon(new ImageIcon(manualImg));
 		manual.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				JFrame instructions = new Instructions(AppDisplay.this);
+				instructions.setVisible(true);
 			}
 		});
 		manual.setBounds(267, 269, 73, 54);
