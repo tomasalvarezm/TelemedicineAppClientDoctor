@@ -37,19 +37,6 @@ public class AppDisplay extends JFrame {
 	private JTextField userID;
 	private ClientDoctor client;
 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					AppDisplay frame = new AppDisplay();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
 	/**
 	 * Create the frame.
 	 */
